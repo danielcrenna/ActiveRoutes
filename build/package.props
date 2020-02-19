@@ -11,8 +11,8 @@
     <RepositoryUrl>https://github.com/danielcrenna/ActiveRoutes</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>dynamic routing mvc</PackageTags>
-    <Version>1.0.2</Version>
-    <PackageReleaseNotes>Added DynamicAuthorizeAttribute.</PackageReleaseNotes>
+    <Version>1.0.3</Version>
+    <PackageReleaseNotes>Fixes and performance improvements for template matching.</PackageReleaseNotes>
   </PropertyGroup>
 
 </Project>
