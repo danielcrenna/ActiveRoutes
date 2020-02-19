@@ -1,15 +1,12 @@
 ﻿// Copyright (c) Daniel Crenna & Contributors. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-using ActiveRoutes;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Demo.RuntimeFeature
+namespace ActiveRoutes
 {
-	public class RuntimeBuilder : IFeatureBuilder
+	public interface IFeatureBuilder
 	{
-		public RuntimeBuilder(IServiceCollection services) => Services = services;
-
-		public IServiceCollection Services { get; }
+		IServiceCollection Services { get; }
 	}
 }

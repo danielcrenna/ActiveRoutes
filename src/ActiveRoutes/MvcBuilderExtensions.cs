@@ -3,6 +3,7 @@
 
 using System.Reflection;
 using ActiveRoutes.Internal;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
@@ -14,6 +15,28 @@ namespace ActiveRoutes
 	{
 		public static TBuilder AddActiveRoute<TBuilder, TController, TComponent, TComponentOptions>(
 			this IMvcCoreBuilder mvcBuilder)
+			where TBuilder : IFeatureBuilder
+			where TController : ControllerBase
+			where TComponent : class, IDynamicComponent
+			where TComponentOptions : class, IFeatureNamespace
+		{
+			AddActiveRouteImpl<TController, TComponent, TComponentOptions>(mvcBuilder);
+
+			return Instancing.CreateInstance<TBuilder>(mvcBuilder.Services);
+		}
+
+		public static IMvcCoreBuilder AddActiveRoute<TController, TComponent, TComponentOptions>(this IMvcCoreBuilder mvcBuilder)
+			where TController : ControllerBase
+			where TComponent : class, IDynamicComponent
+			where TComponentOptions : class, IFeatureNamespace
+		{
+			AddActiveRouteImpl<TController, TComponent, TComponentOptions>(mvcBuilder);
+
+			return mvcBuilder;
+		}
+
+		private static void AddActiveRouteImpl<TController, TComponent, TComponentOptions>(IMvcCoreBuilder mvcBuilder)
+			where TController : ControllerBase
 			where TComponent : class, IDynamicComponent
 			where TComponentOptions : class, IFeatureNamespace
 		{
@@ -52,8 +75,6 @@ namespace ActiveRoutes
 				if (x.GetPolicy(Constants.Security.Policies.NoPolicy) == null)
 					x.AddPolicy(Constants.Security.Policies.NoPolicy, b => { b.RequireAssertion(context => true); });
 			});
-
-			return Instancing.CreateInstance<TBuilder>(mvcBuilder.Services);
 		}
 	}
 }

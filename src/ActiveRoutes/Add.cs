@@ -19,8 +19,7 @@ namespace ActiveRoutes
 			services.AddAuthenticationCore();
 
 			var mvcBuilder = services.AddMvcCore();
-			//mvcBuilder.Services.TryAddTransient<IFilterProvider>(r =>
-			//    new DynamicAuthorizeFilterProvider(r.GetServices<IDynamicComponent>()));
+
 			mvcBuilder.Services.TryAddEnumerable(ServiceDescriptor
 				.Transient<IApplicationModelProvider, DynamicApplicationModelProvider>());
 			mvcBuilder.Services.Replace(ServiceDescriptor
