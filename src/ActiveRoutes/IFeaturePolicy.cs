@@ -3,8 +3,8 @@
 
 namespace ActiveRoutes
 {
-    public interface IFeaturePolicy
-    {
-        string Policy { get; }
-    }
+	public interface IFeaturePolicy
+	{
+		string Policy { get; }
+	}
 }

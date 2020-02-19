@@ -13,34 +13,34 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Demo.Controllers
 {
-    public class TokenController : Controller
-    {
-        private readonly JwtSecurityTokenHandler _handler;
-        private readonly IOptionsSnapshot<TokenOptions> _options;
+	public class TokenController : Controller
+	{
+		private readonly JwtSecurityTokenHandler _handler;
+		private readonly IOptionsSnapshot<TokenOptions> _options;
 
-        public TokenController(IOptionsSnapshot<TokenOptions> options)
-        {
-            _options = options;
-            _handler = new JwtSecurityTokenHandler();
-        }
+		public TokenController(IOptionsSnapshot<TokenOptions> options)
+		{
+			_options = options;
+			_handler = new JwtSecurityTokenHandler();
+		}
 
-        [HttpPost("token")]
-        public IActionResult GenerateToken([FromBody] TokenRequestModel model)
-        {
-            var claims = new[]
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, model.Email),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-            };
+		[HttpPost("token")]
+		public IActionResult GenerateToken([FromBody] TokenRequestModel model)
+		{
+			var claims = new[]
+			{
+				new Claim(JwtRegisteredClaimNames.Sub, model.Email),
+				new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+			};
 
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Value.Key));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+			var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Value.Key));
+			var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-            var token = new JwtSecurityToken(_options.Value.Issuer, _options.Value.Audience, claims,
-                expires: DateTime.Now.AddHours(1),
-                signingCredentials: credentials);
+			var token = new JwtSecurityToken(_options.Value.Issuer, _options.Value.Audience, claims,
+				expires: DateTime.Now.AddHours(1),
+				signingCredentials: credentials);
 
-            return Ok(new {token = _handler.WriteToken(token)});
-        }
-    }
+			return Ok(new {token = _handler.WriteToken(token)});
+		}
+	}
 }

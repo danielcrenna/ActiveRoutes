@@ -3,19 +3,19 @@
 
 namespace ActiveRoutes
 {
-    public static class Constants
-    {
-        public static class Security
-        {
-            public static class Schemes
-            {
-                public const string NoScheme = nameof(NoScheme);
-            }
+	public static class Constants
+	{
+		public static class Security
+		{
+			public static class Schemes
+			{
+				public const string NoScheme = nameof(NoScheme);
+			}
 
-            public static class Policies
-            {
-                public const string NoPolicy = nameof(NoPolicy);
-            }
-        }
-    }
+			public static class Policies
+			{
+				public const string NoPolicy = nameof(NoPolicy);
+			}
+		}
+	}
 }

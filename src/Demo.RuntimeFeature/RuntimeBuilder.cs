@@ -5,13 +5,10 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Demo.RuntimeFeature
 {
-    public class RuntimeBuilder
-    {
-        public RuntimeBuilder(IServiceCollection services)
-        {
-            Services = services;
-        }
+	public class RuntimeBuilder
+	{
+		public RuntimeBuilder(IServiceCollection services) => Services = services;
 
-        public IServiceCollection Services { get; }
-    }
+		public IServiceCollection Services { get; }
+	}
 }

@@ -11,25 +11,25 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace ActiveRoutes
 {
-    public static class Add
-    {
-        public static IServiceCollection AddActiveRouting(this IServiceCollection services,
-            Action<IMvcCoreBuilder> builderAction)
-        {
-            services.AddAuthenticationCore();
+	public static class Add
+	{
+		public static IServiceCollection AddActiveRouting(this IServiceCollection services,
+			Action<IMvcCoreBuilder> builderAction)
+		{
+			services.AddAuthenticationCore();
 
-            var mvcBuilder = services.AddMvcCore();
-            //mvcBuilder.Services.TryAddTransient<IFilterProvider>(r =>
-            //    new DynamicAuthorizeFilterProvider(r.GetServices<IDynamicComponent>()));
-            mvcBuilder.Services.TryAddEnumerable(ServiceDescriptor
-                .Transient<IApplicationModelProvider, DynamicApplicationModelProvider>());
-            mvcBuilder.Services.Replace(ServiceDescriptor
-                .Singleton<IAuthorizationPolicyProvider, DynamicAuthorizationPolicyProvider>());
+			var mvcBuilder = services.AddMvcCore();
+			//mvcBuilder.Services.TryAddTransient<IFilterProvider>(r =>
+			//    new DynamicAuthorizeFilterProvider(r.GetServices<IDynamicComponent>()));
+			mvcBuilder.Services.TryAddEnumerable(ServiceDescriptor
+				.Transient<IApplicationModelProvider, DynamicApplicationModelProvider>());
+			mvcBuilder.Services.Replace(ServiceDescriptor
+				.Singleton<IAuthorizationPolicyProvider, DynamicAuthorizationPolicyProvider>());
 
-            services.AddSingleton<ActiveRouter>();
+			services.AddSingleton<ActiveRouter>();
 
-            builderAction?.Invoke(mvcBuilder);
-            return services;
-        }
-    }
+			builderAction?.Invoke(mvcBuilder);
+			return services;
+		}
+	}
 }

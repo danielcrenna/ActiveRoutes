@@ -3,8 +3,8 @@
 
 namespace ActiveRoutes
 {
-    public interface IFeatureScheme
-    {
-        string Scheme { get; }
-    }
+	public interface IFeatureScheme
+	{
+		string Scheme { get; }
+	}
 }

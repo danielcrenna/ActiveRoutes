@@ -7,13 +7,10 @@ using ActiveRoutes;
 
 namespace Demo.RuntimeFeature
 {
-    public class RuntimeFeature : DynamicFeature
-    {
-        public RuntimeFeature()
-        {
-            ControllerTypes = new[] {typeof(RuntimeController<>)};
-        }
+	public class RuntimeFeature : DynamicFeature
+	{
+		public RuntimeFeature() => ControllerTypes = new[] {typeof(RuntimeController<>)};
 
-        public override IList<Type> ControllerTypes { get; } = new List<Type>();
-    }
+		public override IList<Type> ControllerTypes { get; } = new List<Type>();
+	}
 }

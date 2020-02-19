@@ -6,9 +6,9 @@ using System.Collections.Generic;
 
 namespace ActiveRoutes
 {
-    public interface IDynamicComponent
-    {
-        IList<Type> ControllerTypes { get; }
-        Func<string> GetRouteTemplate { get; set; }
-    }
+	public interface IDynamicComponent
+	{
+		IList<Type> ControllerTypes { get; }
+		Func<string> GetRouteTemplate { get; set; }
+	}
 }

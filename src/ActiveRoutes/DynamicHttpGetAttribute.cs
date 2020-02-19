@@ -3,10 +3,10 @@
 
 namespace ActiveRoutes
 {
-    public sealed class DynamicHttpGetAttribute : DynamicHttpMethodAttribute
-    {
-        public DynamicHttpGetAttribute(string template) : base(new[] {"GET"}, template)
-        {
-        }
-    }
+	public sealed class DynamicHttpGetAttribute : DynamicHttpMethodAttribute
+	{
+		private static readonly string[] Methods = {global::HttpMethods.Get};
+		public DynamicHttpGetAttribute(): base(Methods) { }
+		public DynamicHttpGetAttribute(string template) : base(Methods, template) { }
+	}
 }

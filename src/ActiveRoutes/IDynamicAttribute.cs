@@ -5,8 +5,8 @@ using System;
 
 namespace ActiveRoutes
 {
-    public interface IDynamicAttribute
-    {
-        IServiceProvider ServiceProvider { get; set; }
-    }
+	public interface IDynamicAttribute
+	{
+		IServiceProvider ServiceProvider { get; set; }
+	}
 }

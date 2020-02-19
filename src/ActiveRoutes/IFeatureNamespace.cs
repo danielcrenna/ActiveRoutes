@@ -3,8 +3,8 @@
 
 namespace ActiveRoutes
 {
-    public interface IFeatureNamespace
-    {
-        string RootPath { get; }
-    }
+	public interface IFeatureNamespace
+	{
+		string RootPath { get; }
+	}
 }

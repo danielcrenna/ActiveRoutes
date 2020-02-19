@@ -3,8 +3,8 @@
 
 namespace Demo.Models
 {
-    public class TokenRequestModel
-    {
-        public string Email { get; set; }
-    }
+	public class TokenRequestModel
+	{
+		public string Email { get; set; }
+	}
 }

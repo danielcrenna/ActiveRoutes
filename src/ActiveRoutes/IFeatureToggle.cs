@@ -3,8 +3,8 @@
 
 namespace ActiveRoutes
 {
-    public interface IFeatureToggle
-    {
-        bool Enabled { get; set; }
-    }
+	public interface IFeatureToggle
+	{
+		bool Enabled { get; set; }
+	}
 }

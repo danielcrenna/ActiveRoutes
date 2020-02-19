@@ -5,15 +5,15 @@ using ActiveRoutes;
 
 namespace Demo.RuntimeFeature
 {
-    public class RuntimeOptions :
-        IFeatureToggle,
-        IFeatureNamespace,
-        IFeatureScheme,
-        IFeaturePolicy
-    {
-        public string RootPath { get; set; } = "/api";
-        public string Policy { get; set; } = Constants.Security.Policies.NoPolicy;
-        public string Scheme { get; set; } = Constants.Security.Schemes.NoScheme;
-        public bool Enabled { get; set; } = true;
-    }
+	public class RuntimeOptions :
+		IFeatureToggle,
+		IFeatureNamespace,
+		IFeatureScheme,
+		IFeaturePolicy
+	{
+		public string RootPath { get; set; } = "/api";
+		public string Policy { get; set; } = Constants.Security.Policies.NoPolicy;
+		public string Scheme { get; set; } = Constants.Security.Schemes.NoScheme;
+		public bool Enabled { get; set; } = true;
+	}
 }

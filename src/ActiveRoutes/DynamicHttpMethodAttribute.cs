@@ -7,18 +7,22 @@ using Microsoft.AspNetCore.Mvc.Routing;
 
 namespace ActiveRoutes
 {
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-    public abstract class DynamicHttpMethodAttribute : Attribute, IActionHttpMethodProvider
-    {
-        protected DynamicHttpMethodAttribute(IEnumerable<string> httpMethods, string template)
-        {
-            HttpMethods = httpMethods;
-            Template = template;
-        }
+	[AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+	public abstract class DynamicHttpMethodAttribute : Attribute, IActionHttpMethodProvider
+	{
+		protected DynamicHttpMethodAttribute(IEnumerable<string> httpMethods)
+		{
+			HttpMethods = httpMethods;
+		}
 
-        public string Name { get; set; }
-        public string Template { get; }
+		protected DynamicHttpMethodAttribute(IEnumerable<string> httpMethods, string template) : this(httpMethods)
+		{
+			Template = template;
+		}
 
-        public IEnumerable<string> HttpMethods { get; }
-    }
+		public string Name { get; set; }
+		public string Template { get; }
+
+		public IEnumerable<string> HttpMethods { get; }
+	}
 }

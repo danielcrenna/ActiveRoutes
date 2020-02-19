@@ -7,13 +7,13 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Demo.RuntimeFeature
 {
-    [DynamicController(typeof(RuntimeOptions))]
-    public class RuntimeController<T> : Controller
-    {
-        [DynamicHttpGet("env/name")]
-        public IActionResult GetEnvironmentMachineName()
-        {
-            return Ok($"{Environment.MachineName}.{typeof(T).Name}");
-        }
-    }
+	[DynamicController(typeof(RuntimeOptions))]
+	public class RuntimeController<T> : Controller
+	{
+		[DynamicHttpGet("env/name")]
+		public IActionResult GetEnvironmentMachineName()
+		{
+			return Ok($"{Environment.MachineName}.{typeof(T).Name}");
+		}
+	}
 }

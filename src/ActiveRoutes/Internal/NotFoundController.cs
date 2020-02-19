@@ -5,11 +5,11 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ActiveRoutes.Internal
 {
-    internal sealed class NotFoundController : Controller
-    {
-        public IActionResult RouteNotFound()
-        {
-            return NotFound();
-        }
-    }
+	internal sealed class NotFoundController : Controller
+	{
+		public IActionResult RouteNotFound()
+		{
+			return NotFound();
+		}
+	}
 }

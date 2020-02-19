@@ -11,8 +11,8 @@
     <RepositoryUrl>https://github.com/danielcrenna/ActiveRoutes</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>dynamic routing mvc</PackageTags>
-    <Version>1.0.0</Version>
-    <PackageReleaseNotes>Initial release.</PackageReleaseNotes>
+    <Version>1.0.1</Version>
+    <PackageReleaseNotes>Add additional dynamic routing verbs.</PackageReleaseNotes>
   </PropertyGroup>
 
 </Project>

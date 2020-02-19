@@ -7,36 +7,36 @@ using TypeKitchen;
 
 namespace ActiveRoutes.Internal
 {
-    internal static class ControllerTypeExtensions
-    {
-        public static string NormalizeControllerName(this Type controllerType)
-        {
-            return controllerType.Name.Contains('`')
-                ? GetGenericControllerName(controllerType)
-                : controllerType.Name.Replace(nameof(Controller), string.Empty);
-        }
+	internal static class ControllerTypeExtensions
+	{
+		public static string NormalizeControllerName(this Type controllerType)
+		{
+			return controllerType.Name.Contains('`')
+				? GetGenericControllerName(controllerType)
+				: controllerType.Name.Replace(nameof(Controller), string.Empty);
+		}
 
-        public static string GetGenericControllerName(this Type controllerType)
-        {
-            return Pooling.StringBuilderPool.Scoped(sb =>
-            {
-                if (!controllerType.IsGenericType)
-                {
-                    sb.Append(controllerType.Name);
-                    return;
-                }
+		public static string GetGenericControllerName(this Type controllerType)
+		{
+			return Pooling.StringBuilderPool.Scoped(sb =>
+			{
+				if (!controllerType.IsGenericType)
+				{
+					sb.Append(controllerType.Name);
+					return;
+				}
 
-                var types = controllerType.GetGenericArguments();
-                if (types.Length == 0)
-                {
-                    sb.Append(controllerType.Name);
-                    return;
-                }
+				var types = controllerType.GetGenericArguments();
+				if (types.Length == 0)
+				{
+					sb.Append(controllerType.Name);
+					return;
+				}
 
-                sb.Append(controllerType.Name.Replace($"{nameof(Controller)}`{types.Length}", string.Empty));
-                foreach (var type in types)
-                    sb.Append($"_{type.Name}");
-            });
-        }
-    }
+				sb.Append(controllerType.Name.Replace($"{nameof(Controller)}`{types.Length}", string.Empty));
+				foreach (var type in types)
+					sb.Append($"_{type.Name}");
+			});
+		}
+	}
 }
