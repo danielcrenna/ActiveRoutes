@@ -1,0 +1,18 @@
+<Project>
+
+  <PropertyGroup>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Authors>Daniel Crenna &amp; Contributors</Authors>
+    <Description>Simplified dynamic routing for ASP.NET Core MVC.</Description>
+    <Copyright>Copyright © Daniel Crenna &amp; Contributors. All rights reserved.</Copyright>
+    <PackageIconUrl>https://raw.githubusercontent.com/danielcrenna/ActiveRoutes/master/assets/logo.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/danielcrenna/ActiveRoutes</PackageProjectUrl>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/danielcrenna/ActiveRoutes</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>dynamic routing mvc</PackageTags>
+    <Version>1.0.0</Version>
+    <PackageReleaseNotes>Initial release.</PackageReleaseNotes>
+  </PropertyGroup>
+
+</Project>

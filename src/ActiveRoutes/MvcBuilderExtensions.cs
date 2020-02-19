@@ -21,7 +21,8 @@ namespace ActiveRoutes
             mvcBuilder.AddApplicationPart(typeof(TController).Assembly);
             mvcBuilder.ConfigureApplicationPartManager(x =>
             {
-                x.ApplicationParts.Add(new DynamicControllerApplicationPart(new[] {typeof(TController).GetTypeInfo()}));
+                x.ApplicationParts.Add(
+                    new DynamicControllerApplicationPart(new[] {typeof(TController).GetTypeInfo()}));
             });
 
             mvcBuilder.Services.Replace(ServiceDescriptor.Singleton(r =>
