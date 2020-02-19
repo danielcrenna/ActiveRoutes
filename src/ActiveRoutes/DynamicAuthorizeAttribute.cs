@@ -99,7 +99,8 @@ namespace ActiveRoutes
 			{
 				var key = member.Name;
 
-				if (_segments.Length < segmentIndex + 1 ||
+				if (_segments == null ||
+				    _segments.Length < segmentIndex + 1 ||
 				    _segments[segmentIndex] != key ||
 				    !member.CanRead ||
 				    !reads.TryGetValue(currentValue, key, out var segment))

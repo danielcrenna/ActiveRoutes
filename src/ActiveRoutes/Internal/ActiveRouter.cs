@@ -2,11 +2,15 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Routing.Template;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using TypeKitchen;
@@ -33,7 +37,9 @@ namespace ActiveRoutes.Internal
 
 			values.Remove("route");
 
-			foreach (var component in httpContext.RequestServices.GetServices<IDynamicComponent>())
+			var components = httpContext.RequestServices.GetServices<IDynamicComponent>();
+
+			foreach (var component in components)
 			{
 				if (component.GetRouteTemplate == null)
 					continue;
@@ -60,18 +66,76 @@ namespace ActiveRoutes.Internal
 					{
 						if (!(attribute is DynamicHttpMethodAttribute httpMethod))
 							continue;
-						if (!httpMethod.Template.Equals(action, StringComparison.OrdinalIgnoreCase))
+
+						if (!httpMethod.HttpMethods.Contains(httpContext.Request.Method, StringComparer.OrdinalIgnoreCase))
+							continue;
+
+						var template = GetHttpTemplate(httpMethod, method);
+						if (string.IsNullOrWhiteSpace(template) || !IsMatch(template, $"/{action}", out var extraValues))
 							continue;
 
 						var controller = controllerType.NormalizeControllerName()?.ToLowerInvariant();
 						values["controller"] = controller;
 						values["action"] = method.Name;
+
+						if (extraValues != null)
+						{
+							foreach (var (k, v) in extraValues)
+								values[k] = v;
+						}
+
 						return new ValueTask<RouteValueDictionary>(values);
 					}
 				}
 			}
 
 			return NotFound(values);
+		}
+
+		private static readonly IDictionary<string, RouteTemplate> Templates = new Dictionary<string, RouteTemplate>();
+		private static readonly IDictionary<string, RouteValueDictionary> Defaults = new Dictionary<string, RouteValueDictionary>();
+		private static readonly IDictionary<string, TemplateMatcher> Matchers = new Dictionary<string, TemplateMatcher>();
+
+		public bool IsMatch(string template, PathString action, out RouteValueDictionary values)
+		{
+			if (template.Equals(action, StringComparison.OrdinalIgnoreCase))
+			{
+				values = default;
+				return true;
+			}
+
+			if (!Templates.TryGetValue(template, out var parsed))
+				Templates.Add(template, parsed = TemplateParser.Parse(template));
+
+			if(!Defaults.TryGetValue(template, out var defaults))
+				Defaults.Add(template, defaults = GetDefaultParameters(parsed));
+
+			if(!Matchers.TryGetValue(template, out var matcher))
+				Matchers.Add(template, matcher = new TemplateMatcher(parsed, defaults));
+
+			values = new RouteValueDictionary();
+			var match = matcher.TryMatch(action, values);
+			return match;
+		}
+
+		private static RouteValueDictionary GetDefaultParameters(RouteTemplate parsedTemplate)
+		{
+			var result = new RouteValueDictionary();
+			foreach (var parameter in parsedTemplate.Parameters)
+				if (parameter.DefaultValue != null)
+					result.Add(parameter.Name, parameter.DefaultValue);
+			return result;
+		}
+		
+		private static string GetHttpTemplate(DynamicHttpMethodAttribute httpMethod, AccessorMember member)
+		{
+			if (member.DeclaringType == null || !member.DeclaringType.TryGetAttribute<RouteAttribute>(true, out var routeAttribute))
+				return !string.IsNullOrWhiteSpace(httpMethod.Template) ? httpMethod.Template : default;
+
+			var baseTemplate = routeAttribute.Template;
+			return !string.IsNullOrWhiteSpace(httpMethod.Template)
+				? $"{baseTemplate}/{httpMethod.Template}"
+				: baseTemplate;
 		}
 
 		private static bool IsValidForRequest(ICustomAttributeProvider controllerType, IServiceProvider serviceProvider)
