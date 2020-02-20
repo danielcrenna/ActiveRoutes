@@ -3,6 +3,7 @@
 
 using System;
 using ActiveRoutes.Internal;
+using ActiveRoutes.Internal.Conventions;
 using ActiveRoutes.Internal.Providers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;

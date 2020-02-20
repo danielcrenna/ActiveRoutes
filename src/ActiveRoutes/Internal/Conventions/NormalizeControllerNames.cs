@@ -3,7 +3,7 @@
 
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
-namespace ActiveRoutes.Internal
+namespace ActiveRoutes.Internal.Conventions
 {
 	internal sealed class NormalizeControllerNames : IControllerModelConvention
 	{
