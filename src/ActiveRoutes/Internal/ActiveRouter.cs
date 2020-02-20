@@ -187,13 +187,14 @@ namespace ActiveRoutes.Internal
 		}
 
 		private static object WalkFeatureRecursive(int segmentIndex, object currentValue, IReadAccessor reads,
-			AccessorMembers members, string[] segments)
+			AccessorMembers members, IReadOnlyList<string> segments)
 		{
 			foreach (var member in members)
 			{
 				var key = member.Name;
 
-				if (segments.Length < segmentIndex + 1 ||
+				if (segments == null ||
+				    segments.Count < segmentIndex + 1 ||
 				    segments[segmentIndex] != key ||
 				    !member.CanRead ||
 				    !reads.TryGetValue(currentValue, key, out var segment))

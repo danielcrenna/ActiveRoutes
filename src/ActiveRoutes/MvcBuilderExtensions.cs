@@ -19,7 +19,7 @@ namespace ActiveRoutes
 			this IMvcCoreBuilder mvcBuilder)
 			where TBuilder : IFeatureBuilder
 			where TComponent : class, IDynamicComponent
-			where TComponentOptions : class, IFeatureNamespace
+			where TComponentOptions : class
 		{
 			AddActiveRouteImpl<TController, TComponent, TComponentOptions>(mvcBuilder);
 
@@ -28,7 +28,7 @@ namespace ActiveRoutes
 
 		public static IMvcCoreBuilder AddActiveRoute<TController, TComponent, TComponentOptions>(this IMvcCoreBuilder mvcBuilder)
 			where TComponent : class, IDynamicComponent
-			where TComponentOptions : class, IFeatureNamespace
+			where TComponentOptions : class
 		{
 			AddActiveRouteImpl<TController, TComponent, TComponentOptions>(mvcBuilder);
 
@@ -37,7 +37,7 @@ namespace ActiveRoutes
 
 		private static void AddActiveRouteImpl<TController, TComponent, TComponentOptions>(IMvcCoreBuilder mvcBuilder)
 			where TComponent : class, IDynamicComponent
-			where TComponentOptions : class, IFeatureNamespace
+			where TComponentOptions : class
 		{
 			// Add [DynamicController(typeof(TComponentOptions))] if not present
 			if (!typeof(TController).HasAttribute<DynamicControllerAttribute>())
@@ -53,14 +53,27 @@ namespace ActiveRoutes
 			mvcBuilder.AddApplicationPart(typeof(TController).Assembly);
 			mvcBuilder.ConfigureApplicationPartManager(x =>
 			{
-				x.ApplicationParts.Add(
-					new DynamicControllerApplicationPart(new[] {typeof(TController).GetTypeInfo()}));
+				x.ApplicationParts.Add(new DynamicControllerApplicationPart(new[] {typeof(TController).GetTypeInfo()}));
 			});
 
-			mvcBuilder.Services.Replace(ServiceDescriptor.Singleton(r =>
+			var componentDescriptor = ServiceDescriptor.Singleton(r =>
 			{
 				var component = Instancing.CreateInstance<TComponent>();
+				component.GetRouteTemplate = () =>
+				{
+					var o = r.GetRequiredService<IOptionsMonitor<TComponentOptions>>();
+					return o.CurrentValue is IFeatureNamespace ns ? ns.RootPath ?? string.Empty : string.Empty;
+				};
+				return component;
+			});
 
+			mvcBuilder.Services.Replace(componentDescriptor);
+			mvcBuilder.Services.AddTransient<IDynamicComponent>(r =>
+			{
+				// cached singleton 
+				var component = r.GetService<TComponent>();
+				
+				// each resolution, we could be discovering a different controller that needs hydration into its type
 				for (var i = 0; i < component.ControllerTypes.Count; i++)
 				{
 					var controllerType = component.ControllerTypes[i];
@@ -68,16 +81,8 @@ namespace ActiveRoutes
 						component.ControllerTypes[i] = typeof(TController);
 				}
 
-				component.GetRouteTemplate = () =>
-				{
-					var o = r.GetRequiredService<IOptionsMonitor<TComponentOptions>>();
-					return o.CurrentValue.RootPath ?? string.Empty;
-				};
-
 				return component;
-			}));
-
-			mvcBuilder.Services.AddSingleton<IDynamicComponent>(r => r.GetService<TComponent>());
+			});
 
 			mvcBuilder.AddAuthorization(x =>
 			{
