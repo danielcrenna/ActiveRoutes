@@ -1,12 +1,14 @@
 ﻿// Copyright (c) Daniel Crenna & Contributors. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using System;
+using System.ComponentModel;
 using System.Reflection;
 using ActiveRoutes.Internal;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
+using TypeKitchen;
 using TypeKitchen.Creation;
 
 namespace ActiveRoutes
@@ -16,7 +18,6 @@ namespace ActiveRoutes
 		public static TBuilder AddActiveRoute<TBuilder, TController, TComponent, TComponentOptions>(
 			this IMvcCoreBuilder mvcBuilder)
 			where TBuilder : IFeatureBuilder
-			where TController : ControllerBase
 			where TComponent : class, IDynamicComponent
 			where TComponentOptions : class, IFeatureNamespace
 		{
@@ -26,7 +27,6 @@ namespace ActiveRoutes
 		}
 
 		public static IMvcCoreBuilder AddActiveRoute<TController, TComponent, TComponentOptions>(this IMvcCoreBuilder mvcBuilder)
-			where TController : ControllerBase
 			where TComponent : class, IDynamicComponent
 			where TComponentOptions : class, IFeatureNamespace
 		{
@@ -36,10 +36,19 @@ namespace ActiveRoutes
 		}
 
 		private static void AddActiveRouteImpl<TController, TComponent, TComponentOptions>(IMvcCoreBuilder mvcBuilder)
-			where TController : ControllerBase
 			where TComponent : class, IDynamicComponent
 			where TComponentOptions : class, IFeatureNamespace
 		{
+			// Add [DynamicController(typeof(TComponentOptions))] if not present
+			if (!typeof(TController).HasAttribute<DynamicControllerAttribute>())
+			{
+				var attribute = new DynamicControllerAttribute(typeof(TComponentOptions));
+				TypeDescriptor.AddAttributes(typeof(TController), attribute);
+				var attributes = TypeDescriptor.GetAttributes(typeof(TController));
+				if(!attributes.Contains(attribute))
+					throw new InvalidOperationException("Could not add attribute dynamically on this runtime.");
+			}
+
 			// See: https://github.com/aspnet/Mvc/issues/5992
 			mvcBuilder.AddApplicationPart(typeof(TController).Assembly);
 			mvcBuilder.ConfigureApplicationPartManager(x =>

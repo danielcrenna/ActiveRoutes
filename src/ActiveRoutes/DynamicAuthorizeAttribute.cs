@@ -15,7 +15,7 @@ using TypeKitchen;
 
 namespace ActiveRoutes
 {
-	public class DynamicAuthorizeAttribute : Attribute, IAuthorizeData
+	public class DynamicAuthorizeAttribute : Attribute, IAuthorizeData, IDynamicAttribute
 	{
 		private readonly Type _policyProviderType;
 		private readonly string[] _segments;

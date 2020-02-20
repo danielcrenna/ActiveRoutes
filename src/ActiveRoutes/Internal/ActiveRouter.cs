@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -78,7 +79,7 @@ namespace ActiveRoutes.Internal
 						values["controller"] = controller;
 						values["action"] = method.Name;
 
-						if (extraValues != null)
+						if (extraValues != null && extraValues.Count > 0)
 						{
 							foreach (var (k, v) in extraValues)
 								values[k] = v;
@@ -140,11 +141,14 @@ namespace ActiveRoutes.Internal
 
 		private static bool IsValidForRequest(ICustomAttributeProvider controllerType, IServiceProvider serviceProvider)
 		{
-			if (!controllerType.TryGetAttributes<DynamicControllerAttribute>(true, out var attributes))
+			var attributes = TypeDescriptor.GetAttributes(controllerType).OfType<DynamicControllerAttribute>().AsList();
+			if (attributes.FirstOrDefault() == null)
 				return true;
+
 			foreach (var attribute in attributes)
 				if (!IsEnabled(serviceProvider, attribute.FeatureToggleType, attribute.FeatureToggleTypeSegments))
 					return false;
+
 			return true;
 		}
 

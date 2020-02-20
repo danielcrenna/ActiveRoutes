@@ -9,9 +9,8 @@ namespace ActiveRoutes.Internal
 {
 	internal sealed class DynamicControllerApplicationPart : ApplicationPart, IApplicationPartTypeProvider
 	{
-		public DynamicControllerApplicationPart(IEnumerable<TypeInfo> types) => Types = types;
-
 		public override string Name => nameof(DynamicControllerApplicationPart);
 		public IEnumerable<TypeInfo> Types { get; }
+		public DynamicControllerApplicationPart(IEnumerable<TypeInfo> types) => Types = types;
 	}
 }

@@ -6,6 +6,8 @@ using ActiveRoutes.Internal;
 using ActiveRoutes.Internal.Providers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -17,16 +19,19 @@ namespace ActiveRoutes
 			Action<IMvcCoreBuilder> builderAction)
 		{
 			services.AddAuthenticationCore();
-
-			var mvcBuilder = services.AddMvcCore();
-
-			mvcBuilder.Services.TryAddEnumerable(ServiceDescriptor
-				.Transient<IApplicationModelProvider, DynamicApplicationModelProvider>());
-			mvcBuilder.Services.Replace(ServiceDescriptor
-				.Singleton<IAuthorizationPolicyProvider, DynamicAuthorizationPolicyProvider>());
-
 			services.AddSingleton<ActiveRouter>();
 
+			var mvcBuilder = services.AddMvcCore(o =>
+			{
+				o.Conventions.Add(new NormalizeControllerNames());
+			});
+			
+			mvcBuilder.Services.TryAddEnumerable(ServiceDescriptor
+				.Transient<IApplicationModelProvider, DynamicApplicationModelProvider>());
+
+			mvcBuilder.Services.Replace(ServiceDescriptor
+				.Singleton<IAuthorizationPolicyProvider, DynamicAuthorizationPolicyProvider>());
+			
 			builderAction?.Invoke(mvcBuilder);
 			return services;
 		}

@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Demo.RuntimeFeature
 {
-	[DynamicController(typeof(RuntimeOptions))]
 	public class RuntimeController<T> : Controller
 	{
 		[DynamicHttpGet("env/name")]
