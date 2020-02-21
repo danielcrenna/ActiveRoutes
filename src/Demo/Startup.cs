@@ -24,20 +24,21 @@ namespace Demo
 		// For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
 		public void ConfigureServices(IServiceCollection services)
 		{
-			services.Configure<TokenOptions>(_configuration.GetSection("Token"));
-
+			var config = _configuration.GetSection("Token");
+			services.Configure<TokenOptions>(config);
 			services.AddAuthentication()
 				.AddJwtBearer(o =>
 				{
+					var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Key"]));
+
 					o.TokenValidationParameters = new TokenValidationParameters
 					{
 						ValidateIssuer = true,
 						ValidateAudience = true,
 						ValidateIssuerSigningKey = true,
-						ValidAudience = _configuration.GetSection("Token")["Audience"],
-						ValidIssuer = _configuration.GetSection("Token")["Issuer"],
-						IssuerSigningKey =
-							new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("Token")["Key"]))
+						ValidAudience = config["Audience"],
+						ValidIssuer = config["Issuer"],
+						IssuerSigningKey = signingKey
 					};
 				});
 

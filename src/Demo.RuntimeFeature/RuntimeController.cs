@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Demo.RuntimeFeature
 {
 	public class RuntimeController<T> : Controller
-	{
+	{  
 		[DynamicHttpGet("env/name")]
 		public IActionResult GetEnvironmentMachineName()
 		{
