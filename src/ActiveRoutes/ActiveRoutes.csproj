@@ -13,10 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="TypeKitchen" Version="1.2.2" />
-    <PackageReference Include="WebStrings" Version="1.0.3">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
+    <PackageReference Include="TypeKitchen" Version="1.2.4" />
+    <PackageReference Include="WebStrings" Version="1.1.0" />
   </ItemGroup>
 
 </Project>
