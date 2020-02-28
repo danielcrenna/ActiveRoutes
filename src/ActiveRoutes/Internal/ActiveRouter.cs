@@ -72,12 +72,19 @@ namespace ActiveRoutes.Internal
 							continue;
 
 						var template = GetHttpTemplate(httpMethod, method);
-						if (string.IsNullOrWhiteSpace(template) || !IsMatch(template, $"/{action}", out var extraValues))
+						if (!IsMatch(template, $"/{action}", out var extraValues))
 							continue;
 
-						var controller = controllerType.NormalizeControllerName()?.ToLowerInvariant();
-						values["controller"] = controller;
-						values["action"] = method.Name;
+						var lastIndex = method.Name.LastIndexOf("Async", StringComparison.OrdinalIgnoreCase);
+
+						// ASP.NET Core MVC conventionally removes "Controller" from the name of the class
+						var controllerName = controllerType.NormalizeControllerName()?.ToLowerInvariant();
+
+						// ASP.NET Core MVC conventionally removes "Async" from the end of class methods
+						var actionName = lastIndex == -1 ? method.Name : method.Name.Substring(0, lastIndex);
+
+						values["controller"] = controllerName;
+						values["action"] = actionName;
 
 						if (extraValues != null && extraValues.Count > 0)
 						{
@@ -99,6 +106,12 @@ namespace ActiveRoutes.Internal
 
 		public bool IsMatch(string template, PathString action, out RouteValueDictionary values)
 		{
+			if (template == null)
+			{
+				values = default;
+				return string.IsNullOrWhiteSpace(action);
+			}
+
 			if (template.Equals(action, StringComparison.OrdinalIgnoreCase))
 			{
 				values = default;
