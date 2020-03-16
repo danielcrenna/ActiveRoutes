@@ -3,7 +3,7 @@
 
 using System.Text;
 using ActiveRoutes;
-using Demo.Configuration;
+using ActiveRoutes.Meta;
 using Demo.RuntimeFeature;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -49,6 +49,8 @@ namespace Demo
 
 				mvcBuilder.AddRuntimeApi<Startup>(_configuration.GetSection("RuntimeFeature"));
 			});
+
+			services.AddMetaApi(_configuration.GetSection("MetaFeature"));
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

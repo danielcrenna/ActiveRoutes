@@ -11,8 +11,8 @@
     <RepositoryUrl>https://github.com/danielcrenna/ActiveRoutes</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>dynamic routing mvc</PackageTags>
-    <Version>1.0.6</Version>
-    <PackageReleaseNotes>Update dependencies.</PackageReleaseNotes>
+    <Version>1.0.8</Version>
+    <PackageReleaseNotes>Add feature extension methods for middleware FeatureEnabled queries.</PackageReleaseNotes>
   </PropertyGroup>
 
 </Project>

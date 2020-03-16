@@ -9,7 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ActiveRoutes\ActiveRoutes.csproj" />
+    <ProjectReference Include="..\ActiveRoutes.Meta\ActiveRoutes.Meta.csproj" />
   </ItemGroup>
 
 </Project>

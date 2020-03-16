@@ -20,6 +20,7 @@ namespace ActiveRoutes.Internal
 {
 	internal sealed class ActiveRouter : DynamicRouteValueTransformer
 	{
+		private readonly IOptions<MvcOptions> _options;
 		private static readonly string NotFoundController;
 		private static readonly string NotFoundAction;
 
@@ -29,14 +30,20 @@ namespace ActiveRoutes.Internal
 			NotFoundAction = nameof(Internal.NotFoundController.RouteNotFound).ToLowerInvariant();
 		}
 
-		public override ValueTask<RouteValueDictionary> TransformAsync(HttpContext httpContext,
-			RouteValueDictionary values)
+		public ActiveRouter(IOptions<MvcOptions> options)
 		{
-			if (!values.TryGetValue("route", out var route) || !(route is string routeValue) ||
+			_options = options;
+		}
+
+		public override ValueTask<RouteValueDictionary> TransformAsync(HttpContext httpContext, RouteValueDictionary values)
+		{
+			const string routeKey = "route";
+
+			if (!values.TryGetValue(routeKey, out var route) || !(route is string routeValue) ||
 			    string.IsNullOrWhiteSpace(routeValue))
 				return new ValueTask<RouteValueDictionary>(values);
 
-			values.Remove("route");
+			values.Remove(routeKey);
 
 			var components = httpContext.RequestServices.GetServices<IDynamicComponent>();
 
@@ -75,16 +82,8 @@ namespace ActiveRoutes.Internal
 						if (!IsMatch(template, $"/{action}", out var extraValues))
 							continue;
 
-						var lastIndex = method.Name.LastIndexOf("Async", StringComparison.OrdinalIgnoreCase);
-
-						// ASP.NET Core MVC conventionally removes "Controller" from the name of the class
-						var controllerName = controllerType.NormalizeControllerName()?.ToLowerInvariant();
-
-						// ASP.NET Core MVC conventionally removes "Async" from the end of class methods
-						var actionName = lastIndex == -1 ? method.Name : method.Name.Substring(0, lastIndex);
-
-						values["controller"] = controllerName;
-						values["action"] = actionName;
+						values["controller"] = ResolveControllerName(controllerType);
+						values["action"] = ResolveActionName(method);
 
 						if (extraValues != null && extraValues.Count > 0)
 						{
@@ -98,6 +97,24 @@ namespace ActiveRoutes.Internal
 			}
 
 			return NotFound(values);
+		}
+
+		// ASP.NET Core MVC conventionally removes "Controller" from the name of the class
+		private static string ResolveControllerName(Type controllerType)
+		{
+			var controllerName = controllerType.NormalizeControllerName()?.ToLowerInvariant();
+			return controllerName;
+		}
+
+		// ASP.NET Core MVC conventionally removes "Async" from the end of class methods
+		private string ResolveActionName(AccessorMember method)
+		{
+			const string suffix = "Async";
+
+			return _options.Value.SuppressAsyncSuffixInActionNames &&
+			       method.Name.EndsWith(suffix, StringComparison.Ordinal)
+				? method.Name.Substring(0, method.Name.Length - suffix.Length)
+				: method.Name;
 		}
 
 		private static readonly IDictionary<string, RouteTemplate> Templates = new Dictionary<string, RouteTemplate>();
@@ -169,6 +186,7 @@ namespace ActiveRoutes.Internal
 		{
 			values["controller"] = NotFoundController;
 			values["action"] = NotFoundAction;
+
 			return new ValueTask<RouteValueDictionary>(values);
 		}
 

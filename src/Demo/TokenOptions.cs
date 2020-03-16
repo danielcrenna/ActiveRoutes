@@ -1,10 +1,12 @@
 ﻿// Copyright (c) Daniel Crenna & Contributors. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-namespace Demo.Models
+namespace Demo
 {
-	public class TokenRequestModel
+	public class TokenOptions
 	{
-		public string Email { get; set; }
+		public string Issuer { get; set; }
+		public string Audience { get; set; }
+		public string Key { get; set; }
 	}
 }
