@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="TypeKitchen" Version="1.2.9" />
+    <PackageReference Include="TypeKitchen" Version="1.2.12" />
     <PackageReference Include="WebStrings" Version="1.1.0" />
   </ItemGroup>
 

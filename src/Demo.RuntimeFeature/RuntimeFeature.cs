@@ -11,6 +11,6 @@ namespace Demo.RuntimeFeature
 	{
 		public RuntimeFeature() => ControllerTypes = new[] {typeof(RuntimeController<>)};
 
-		public override IList<Type> ControllerTypes { get; } = new List<Type>();
+		public override IList<Type> ControllerTypes { get; }
 	}
 }

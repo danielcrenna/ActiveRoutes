@@ -15,8 +15,9 @@ namespace ActiveRoutes
 			HttpMethods = httpMethods;
 		}
 
-		protected DynamicHttpMethodAttribute(IEnumerable<string> httpMethods, string template) : this(httpMethods)
+		protected DynamicHttpMethodAttribute(IEnumerable<string> httpMethods, string template)
 		{
+			HttpMethods = httpMethods;
 			Template = template;
 		}
 

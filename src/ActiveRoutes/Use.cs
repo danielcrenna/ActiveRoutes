@@ -13,7 +13,11 @@ namespace ActiveRoutes
 			app.UseRouting();
 			app.UseAuthentication();
 			app.UseAuthorization();
-			app.UseEndpoints(endpoints => { endpoints.MapDynamicControllerRoute<ActiveRouter>("{**route}"); });
+			app.UseEndpoints(endpoints =>
+			{
+				endpoints.MapControllers();
+				endpoints.MapDynamicControllerRoute<ActiveRouter>("{**route}");
+			});
 			return app;
 		}
 	}
