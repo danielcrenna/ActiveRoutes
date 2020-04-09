@@ -11,8 +11,8 @@
     <RepositoryUrl>https://github.com/danielcrenna/ActiveRoutes</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>dynamic routing mvc</PackageTags>
-    <Version>1.0.12</Version>
-    <PackageReleaseNotes>Fix crash when using ApiExplorer.</PackageReleaseNotes>
+    <Version>1.0.13</Version>
+    <PackageReleaseNotes>Fix false negatives when template is an empty string.</PackageReleaseNotes>
   </PropertyGroup>
 
 </Project>

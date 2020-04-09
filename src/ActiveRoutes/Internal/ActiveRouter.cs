@@ -59,7 +59,7 @@ namespace ActiveRoutes.Internal
 				if (!routeValue.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
 					continue;
 
-				var action = routeValue.Replace($"{prefix}/", string.Empty);
+				var action = prefix == string.Empty? routeValue : routeValue.Replace($"{prefix}/", string.Empty);
 
 				foreach (var controllerType in component.ControllerTypes)
 				{
@@ -72,6 +72,9 @@ namespace ActiveRoutes.Internal
 					foreach (var method in methods)
 					foreach (var attribute in method.Attributes)
 					{
+						if (attribute is NonActionAttribute)
+							continue;
+
 						if (!(attribute is DynamicHttpMethodAttribute httpMethod))
 							continue;
 
@@ -79,6 +82,9 @@ namespace ActiveRoutes.Internal
 							continue;
 
 						var template = GetHttpTemplate(httpMethod, method);
+						if (template == string.Empty)
+							template = prefix;
+
 						if (!IsMatch(template, $"/{action}", out var extraValues))
 							continue;
 
@@ -160,13 +166,22 @@ namespace ActiveRoutes.Internal
 		
 		private static string GetHttpTemplate(DynamicHttpMethodAttribute httpMethod, AccessorMember member)
 		{
-			if (member.DeclaringType == null || !member.DeclaringType.TryGetAttribute<RouteAttribute>(true, out var routeAttribute))
-				return !string.IsNullOrWhiteSpace(httpMethod.Template) ? httpMethod.Template : default;
+			if(member.DeclaringType != null)
+			{
+				if (member.DeclaringType.TryGetAttribute<RouteAttribute>(true, out var routeAttribute))
+				{
+					var baseTemplate = routeAttribute.Template;
 
-			var baseTemplate = routeAttribute.Template;
-			return !string.IsNullOrWhiteSpace(httpMethod.Template)
-				? $"{baseTemplate}/{httpMethod.Template}"
-				: baseTemplate;
+					return !string.IsNullOrWhiteSpace(httpMethod.Template)
+						? $"{baseTemplate}/{httpMethod.Template}"
+						: baseTemplate;
+				}
+			}
+
+			if (httpMethod.Template == string.Empty)
+				return string.Empty;
+
+			return !string.IsNullOrWhiteSpace(httpMethod.Template) ? httpMethod.Template : default;
 		}
 
 		private static bool IsValidForRequest(ICustomAttributeProvider controllerType, IServiceProvider serviceProvider)

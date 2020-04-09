@@ -15,7 +15,6 @@ namespace ActiveRoutes
 			app.UseAuthorization();
 			app.UseEndpoints(endpoints =>
 			{
-				endpoints.MapControllers();
 				endpoints.MapDynamicControllerRoute<ActiveRouter>("{**route}");
 			});
 			return app;
