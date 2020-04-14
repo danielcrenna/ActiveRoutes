@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Template;
@@ -63,7 +64,7 @@ namespace ActiveRoutes.Internal
 
 				foreach (var controllerType in component.ControllerTypes)
 				{
-					if (!IsValidForRequest(controllerType, httpContext.RequestServices))
+					if (!IsValidForRequest(controllerType, httpContext))
 						continue;
 
 					var methods = AccessorMembers.Create(controllerType, AccessorMemberTypes.Methods,
@@ -85,9 +86,9 @@ namespace ActiveRoutes.Internal
 						if (template == string.Empty)
 							template = prefix;
 
-						if (!IsMatch(template, $"/{action}", out var extraValues))
+						if (!IsMatch(template, $"/{action}", httpContext, method, out var extraValues))
 							continue;
-
+						
 						values["controller"] = ResolveControllerName(controllerType);
 						values["action"] = ResolveActionName(method);
 
@@ -127,7 +128,7 @@ namespace ActiveRoutes.Internal
 		private static readonly IDictionary<string, RouteValueDictionary> Defaults = new Dictionary<string, RouteValueDictionary>();
 		private static readonly IDictionary<string, TemplateMatcher> Matchers = new Dictionary<string, TemplateMatcher>();
 
-		public bool IsMatch(string template, PathString action, out RouteValueDictionary values)
+		public bool IsMatch(string template, PathString action, HttpContext httpContext, AccessorMember method, out RouteValueDictionary values)
 		{
 			if (template == null)
 			{
@@ -151,8 +152,22 @@ namespace ActiveRoutes.Internal
 				Matchers.Add(template, matcher = new TemplateMatcher(parsed, defaults));
 
 			values = new RouteValueDictionary();
-			var match = matcher.TryMatch(action, values);
-			return match;
+			
+			if (!matcher.TryMatch(action, values))
+				return false;
+
+			var constraints = method.Attributes.OfType<IActionConstraint>().OrderBy(x => x.Order).AsList();
+			if (constraints.Count > 0)
+			{
+				var context = new ActionConstraintContext {RouteContext = new RouteContext(httpContext)};
+				foreach (var constraint in constraints)
+				{
+					if (!constraint.Accept(context))
+						return false;
+				}
+			}
+
+			return true;
 		}
 
 		private static RouteValueDictionary GetDefaultParameters(RouteTemplate parsedTemplate)
@@ -184,17 +199,31 @@ namespace ActiveRoutes.Internal
 			return !string.IsNullOrWhiteSpace(httpMethod.Template) ? httpMethod.Template : default;
 		}
 
-		private static bool IsValidForRequest(ICustomAttributeProvider controllerType, IServiceProvider serviceProvider)
+		private static bool IsValidForRequest(ICustomAttributeProvider controllerType, HttpContext httpContext)
+		{
+			IsFeatureEnabled(controllerType, httpContext.RequestServices, out var isFeatureEnabled);
+			return isFeatureEnabled;
+		}
+
+		private static bool IsFeatureEnabled(ICustomAttributeProvider controllerType, IServiceProvider serviceProvider,
+			out bool isValidForRequest)
 		{
 			var attributes = TypeDescriptor.GetAttributes(controllerType).OfType<DynamicControllerAttribute>().AsList();
 			if (attributes.FirstOrDefault() == null)
+			{
+				isValidForRequest = true;
 				return true;
+			}
 
 			foreach (var attribute in attributes)
 				if (!IsEnabled(serviceProvider, attribute.FeatureToggleType, attribute.FeatureToggleTypeSegments))
-					return false;
+				{
+					isValidForRequest = false;
+					return true;
+				}
 
-			return true;
+			isValidForRequest = false;
+			return false;
 		}
 
 		private static ValueTask<RouteValueDictionary> NotFound(RouteValueDictionary values)
