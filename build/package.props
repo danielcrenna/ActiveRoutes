@@ -11,8 +11,8 @@
     <RepositoryUrl>https://github.com/danielcrenna/ActiveRoutes</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>dynamic routing mvc</PackageTags>
-    <Version>1.0.13</Version>
-    <PackageReleaseNotes>Fix false negatives when template is an empty string.</PackageReleaseNotes>
+    <Version>1.0.15</Version>
+    <PackageReleaseNotes>Fix regression in valid request checking.</PackageReleaseNotes>
   </PropertyGroup>
 
 </Project>

@@ -46,7 +46,7 @@ namespace ActiveRoutes.Internal
 
 			values.Remove(routeKey);
 
-			var components = httpContext.RequestServices.GetServices<IDynamicComponent>();
+			var components = httpContext.RequestServices.GetServices<IDynamicFeature>();
 
 			foreach (var component in components)
 			{
@@ -201,29 +201,17 @@ namespace ActiveRoutes.Internal
 
 		private static bool IsValidForRequest(ICustomAttributeProvider controllerType, HttpContext httpContext)
 		{
-			IsFeatureEnabled(controllerType, httpContext.RequestServices, out var isFeatureEnabled);
-			return isFeatureEnabled;
-		}
-
-		private static bool IsFeatureEnabled(ICustomAttributeProvider controllerType, IServiceProvider serviceProvider,
-			out bool isValidForRequest)
-		{
 			var attributes = TypeDescriptor.GetAttributes(controllerType).OfType<DynamicControllerAttribute>().AsList();
 			if (attributes.FirstOrDefault() == null)
-			{
-				isValidForRequest = true;
 				return true;
-			}
 
 			foreach (var attribute in attributes)
-				if (!IsEnabled(serviceProvider, attribute.FeatureToggleType, attribute.FeatureToggleTypeSegments))
+				if (!IsEnabled(httpContext.RequestServices, attribute.FeatureToggleType, attribute.FeatureToggleTypeSegments))
 				{
-					isValidForRequest = false;
-					return true;
+					return false;
 				}
 
-			isValidForRequest = false;
-			return false;
+			return true;
 		}
 
 		private static ValueTask<RouteValueDictionary> NotFound(RouteValueDictionary values)

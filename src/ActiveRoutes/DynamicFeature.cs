@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace ActiveRoutes
 {
-	public abstract class DynamicFeature : IDynamicComponent
+	public abstract class DynamicFeature : IDynamicFeature
 	{
 		public abstract IList<Type> ControllerTypes { get; }
 		public Func<string> GetRouteTemplate { get; set; }

@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.Linq;
 using ActiveRoutes.Internal;
 using ActiveRoutes.Internal.Conventions;
 using ActiveRoutes.Internal.Providers;
@@ -18,11 +19,12 @@ namespace ActiveRoutes
 			Action<IMvcCoreBuilder> builderAction)
 		{
 			services.AddAuthenticationCore();
-			services.AddSingleton<ActiveRouter>();
+			services.TryAddSingleton<ActiveRouter>();
 
 			var mvcBuilder = services.AddMvcCore(o =>
 			{
-				o.Conventions.Add(new NormalizeControllerNames());
+				if(!o.Conventions.OfType<NormalizeControllerNames>().Any())
+					o.Conventions.Add(new NormalizeControllerNames());
 			});
 			
 			mvcBuilder.Services.TryAddEnumerable(ServiceDescriptor

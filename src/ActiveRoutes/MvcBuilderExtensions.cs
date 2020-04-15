@@ -15,34 +15,34 @@ namespace ActiveRoutes
 {
 	public static class MvcBuilderExtensions
 	{
-		public static TBuilder AddActiveRoute<TBuilder, TController, TComponent, TComponentOptions>(
+		public static TBuilder AddActiveRoute<TBuilder, TController, TFeature, TFeatureOptions>(
 			this IMvcCoreBuilder mvcBuilder)
 			where TBuilder : IFeatureBuilder
-			where TComponent : class, IDynamicComponent
-			where TComponentOptions : class
+			where TFeature : class, IDynamicFeature
+			where TFeatureOptions : class
 		{
-			AddActiveRouteImpl<TController, TComponent, TComponentOptions>(mvcBuilder);
+			AddActiveRouteImpl<TController, TFeature, TFeatureOptions>(mvcBuilder);
 
 			return Instancing.CreateInstance<TBuilder>(mvcBuilder.Services);
 		}
 
-		public static IMvcCoreBuilder AddActiveRoute<TController, TComponent, TComponentOptions>(this IMvcCoreBuilder mvcBuilder)
-			where TComponent : class, IDynamicComponent
-			where TComponentOptions : class
+		public static IMvcCoreBuilder AddActiveRoute<TController, TFeature, TFeatureOptions>(this IMvcCoreBuilder mvcBuilder)
+			where TFeature : class, IDynamicFeature
+			where TFeatureOptions : class
 		{
-			AddActiveRouteImpl<TController, TComponent, TComponentOptions>(mvcBuilder);
+			AddActiveRouteImpl<TController, TFeature, TFeatureOptions>(mvcBuilder);
 
 			return mvcBuilder;
 		}
 
-		private static void AddActiveRouteImpl<TController, TComponent, TComponentOptions>(IMvcCoreBuilder mvcBuilder)
-			where TComponent : class, IDynamicComponent
-			where TComponentOptions : class
+		private static void AddActiveRouteImpl<TController, TFeature, TFeatureOptions>(IMvcCoreBuilder mvcBuilder)
+			where TFeature : class, IDynamicFeature
+			where TFeatureOptions : class
 		{
 			// Add [DynamicController(typeof(TComponentOptions))] if not present
 			if (!typeof(TController).HasAttribute<DynamicControllerAttribute>())
 			{
-				var attribute = new DynamicControllerAttribute(typeof(TComponentOptions));
+				var attribute = new DynamicControllerAttribute(typeof(TFeatureOptions));
 				TypeDescriptor.AddAttributes(typeof(TController), attribute);
 				var attributes = TypeDescriptor.GetAttributes(typeof(TController));
 				if(!attributes.Contains(attribute))
@@ -58,20 +58,20 @@ namespace ActiveRoutes
 
 			var componentDescriptor = ServiceDescriptor.Singleton(r =>
 			{
-				var component = Instancing.CreateInstance<TComponent>();
+				var component = Instancing.CreateInstance<TFeature>();
 				component.GetRouteTemplate = () =>
 				{
-					var o = r.GetRequiredService<IOptionsMonitor<TComponentOptions>>();
+					var o = r.GetRequiredService<IOptionsMonitor<TFeatureOptions>>();
 					return o.CurrentValue is IFeatureNamespace ns ? ns.RootPath ?? string.Empty : string.Empty;
 				};
 				return component;
 			});
 
 			mvcBuilder.Services.Replace(componentDescriptor);
-			mvcBuilder.Services.AddTransient<IDynamicComponent>(r =>
+			mvcBuilder.Services.AddTransient<IDynamicFeature>(r =>
 			{
 				// cached singleton 
-				var component = r.GetService<TComponent>();
+				var component = r.GetService<TFeature>();
 				
 				// each resolution, we could be discovering a different controller that needs hydration into its type
 				for (var i = 0; i < component.ControllerTypes.Count; i++)
