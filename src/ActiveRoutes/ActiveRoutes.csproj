@@ -4,7 +4,7 @@
   <Import Project="$(ProjectDir)..\..\build\build.props" />
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>netcoreapp5.0</TargetFramework>
     <Configurations>Debug;Release;Package</Configurations>
   </PropertyGroup>
 
